@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>{{ shop.shop_name if shop else "Buddy" }} - Menu</title>
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}"
+>
+
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    {% if shop %}
+        <a class="brand" href="/shop/{{ shop.subdomain }}">
+            {{ shop.shop_name }}
+        </a>
+    {% else %}
+        <a class="brand" href="/">BUDDY</a>
+    {% endif %}
+
+    <div class="nav-links">
+
+        {% if shop %}
+            <a href="/shop/{{ shop.subdomain }}">Home</a>
+        {% else %}
+            <a href="/">Home</a>
+        {% endif %}
+
+        
+        <a href="/cart">Cart</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/orders">Orders</a>
+        <a href="/search-order">Search Orders</a>
+        <a href="/current-orders">Current Orders</a>
+
+    </div>
+
+</nav>
+
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+    {% for message in messages %}
+
+        <div class="flash-message">
+
+            <p>{{ message }}</p>
+
+            {% if shop %}
+
+                <a href="/shop/{{ shop.subdomain }}/menu">
+                    Continue Shopping
+                </a>
+
+                <a href="/cart">
+                    View Cart
+                </a>
+
+            {% else %}
+
+                <a href="/menu">
+                    Continue Shopping
+                </a>
+
+                <a href="/cart">
+                    View Cart
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    {% endfor %}
+
+{% endif %}
+
+{% endwith %}
+
+
+
+<h1>
+    {{ shop.shop_name if shop else "Buddy" }}
+</h1>
+
+<h2>Our Menu</h2>
+
+
+<div class="product-grid">
+
+    {% for product in products %}
+
+        <div class="product-card">
+
+            <h2>{{ product.name }}</h2>
+
+            <p>
+                ₹{{ product.price_per_kg }}/kg
+            </p>
+
+            <form method="POST" action="/add-to-cart">
+
+                <input
+                    type="hidden"
+                    name="product"
+                    value="{{ product.name }}"
+                >
+
+                {% if shop %}
+                    <input
+                        type="hidden"
+                        name="shop_subdomain"
+                        value="{{ shop.subdomain }}"
+                    >
+                {% endif %}
+
+                <label>Quantity (grams):</label>
+
+                <input
+                    type="number"
+                    name="quantity"
+                    min="1"
+                    required
+                >
+
+                <button type="submit">
+                    Add to Cart
+                </button>
+
+            </form>
+
+        </div>
+
+    {% endfor %}
+
+</div>
+
+</body>
+
+</html>

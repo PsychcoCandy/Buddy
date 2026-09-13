@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Buddy - Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <a class="brand" href="/">BUDDY</a>
+
+        <div class="nav-links">
+
+            <a href="/">Home</a>
+            <a href="/menu">Menu</a>
+            <a href="/cart">Cart</a>
+            <a href="/orders">Orders</a>
+            <a href="/search-order">Search Orders</a>
+            <a href="/current-orders">Current Orders</a>
+
+        </div>
+
+    </nav>
+
+    {% with messages = get_flashed_messages() %}
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <p>
+                    {{ message }}
+                </p>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+    <h1>Buddy</h1>
+
+    <h2>Shop Dashboard</h2>
+
+    <hr>
+
+    <h3>Today's Summary</h3>
+
+    <div class="summary-grid">
+
+        <div class="summary-card">
+            <h4>Orders</h4>
+            <p>{{ order_count }}</p>
+        </div>
+
+        <div class="summary-card">
+            <h4>Quantity Sold</h4>
+
+            <p>Chicken: {{ chicken_quantity }}</p>
+            <p>Mutton: {{ mutton_quantity }}</p>
+        </div>
+
+        <div class="summary-card">
+            <h4>Total Sales</h4>
+            <p>₹{{ "%.2f"|format(total_sales) }}</p>
+        </div>
+
+        <div class="summary-card">
+            <h4>Average Order</h4>
+            <p>₹{{ "%.2f"|format(average_order_value) }}</p>
+        </div>
+
+    </div>
+
+    <hr>
+
+    <h3>Today's Best Sellers</h3>
+
+    {% if product_sales %}
+
+        <div class="best-sellers">
+
+            {% for product, quantity in product_sales %}
+
+                <div class="seller-card {% if loop.index > 3 %}extra-seller{% endif %}">
+
+                    <span class="seller-rank">
+                        #{{ loop.index }}
+                    </span>
+
+                    <div>
+                        <strong>{{ product }}</strong>
+                        <p>{{ quantity }} g sold</p>
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% if product_sales|length > 3 %}
+
+            <button type="button" id="toggle-sellers" onclick="toggleSellers()">
+                Show More
+            </button>
+
+        {% endif %}
+
+    {% else %}
+
+        <p>No sales today.</p>
+
+    {% endif %}
+
+    <hr>
+
+
+<div class="status-filters">
+
+    <a
+        href="/dashboard"
+        class="{% if not status_filter %}active{% endif %}"
+    >
+        All
+    </a>
+
+    <a
+        href="/dashboard?status=New"
+        class="{% if status_filter == 'New' %}active{% endif %}"
+    >
+        New
+    </a>
+
+    <a
+        href="/dashboard?status=Confirmed"
+        class="{% if status_filter == 'Confirmed' %}active{% endif %}"
+    >
+        Confirmed
+    </a>
+
+    <a
+        href="/dashboard?status=Preparing"
+        class="{% if status_filter == 'Preparing' %}active{% endif %}"
+    >
+        Preparing
+    </a>
+
+    <a
+        href="/dashboard?status=Ready"
+        class="{% if status_filter == 'Ready' %}active{% endif %}"
+    >
+        Ready
+    </a>
+
+    <a
+        href="/dashboard?status=Completed"
+        class="{% if status_filter == 'Completed' %}active{% endif %}"
+    >
+        Completed
+    </a>
+
+    <a
+        href="/dashboard?status=Cancelled"
+        class="{% if status_filter == 'Cancelled' %}active{% endif %}"
+    >
+        Cancelled
+    </a>
+
+</div>
+
+
+    <h3>Today's Orders</h3>
+
+    {% if today_orders %}
+
+        {% for order in today_orders %}
+
+            <div>
+
+                <h4>Order #{{ order.order_id }}</h4>
+
+                <p>
+                    Status:
+                    <strong>{{ order.status | default("New") }}</strong>
+                </p>
+
+
+                {% set current_status = order.status | default("New") %}
+
+                {% if allowed_transitions[current_status] %}
+
+                    <form method="POST" action="/update-status">
+
+                        <input
+                            type="hidden"
+                            name="order_id"
+                            value="{{ order.order_id }}"
+                        >
+
+                        <label>
+                            Change Status:
+                        </label>
+
+                        <select name="status">
+
+                            {% for status in allowed_transitions[current_status] %}
+
+                                <option value="{{ status }}">
+                                    {{ status }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <button type="submit">
+                            Update Status
+                        </button>
+
+                    </form>
+
+{% else %}
+
+    <p>
+        <strong>No further status changes.</strong>
+    </p>
+
+{% endif %}
+
+
+                <p>
+                    Customer: {{ order.customer.name }}
+                </p>
+
+                <p>
+                    Phone: {{ order.customer.phone }}
+                </p>
+
+                {% for item in order["items"] %}
+
+                    <p>
+                        {{ item.product }}
+                        — {{ item.quantity_grams }} g
+                        — ₹{{ "%.2f"|format(item.price) }}
+                    </p>
+
+                {% endfor %}
+
+                <strong>
+                    Total: ₹{{ "%.2f"|format(order.total) }}
+                </strong>
+
+                <br><br>
+
+                <a href="/order/{{ order['order_id'] }}">View Order</a>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>No orders today.</p>
+
+    {% endif %}
+
+
+<script>
+
+function toggleSellers() {
+
+    const extraSellers = document.querySelectorAll(".extra-seller");
+    const button = document.getElementById("toggle-sellers");
+
+    const showing = extraSellers[0].style.display === "flex";
+
+    extraSellers.forEach(function(seller) {
+
+        seller.style.display = showing ? "none" : "flex";
+
+    });
+
+    button.textContent = showing ? "Show More" : "Show Less";
+}
+
+</script>
+
+
+</body>
+
+</html>

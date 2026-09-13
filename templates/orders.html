@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Buddy - Orders</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <a class="brand" href="/">BUDDY</a>
+
+        <div class="nav-links">
+
+            <a href="/">Home</a>
+            <a href="/menu">Menu</a>
+            <a href="/cart">Cart</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/search-order">Search Orders</a>
+            <a href="/current-orders">Current Orders</a>
+
+        </div>
+
+    </nav>
+
+    <h1>Buddy</h1>
+
+    <h2>All Orders</h2>
+
+    <hr>
+
+    <form method="GET" action="/orders">
+
+        <label for="date">
+            Date:
+        </label>
+
+        <input
+            type="date"
+            id="date"
+            name="date"
+            value="{{ date_filter or '' }}"
+        >
+
+        <button type="submit">
+            Filter
+        </button>
+
+        {% if date_filter %}
+            <a href="/orders">
+                Clear
+            </a>
+        {% endif %}
+
+    </form>
+
+    <div class="status-filters">
+
+        <a href="/orders"
+           class="{% if not status_filter %}active{% endif %}">
+            All
+        </a>
+
+        <a href="/orders?status=New"
+           class="{% if status_filter == 'New' %}active{% endif %}">
+            New
+        </a>
+
+        <a href="/orders?status=Confirmed"
+           class="{% if status_filter == 'Confirmed' %}active{% endif %}">
+            Confirmed
+        </a>
+
+        <a href="/orders?status=Preparing"
+           class="{% if status_filter == 'Preparing' %}active{% endif %}">
+            Preparing
+        </a>
+
+        <a href="/orders?status=Ready"
+           class="{% if status_filter == 'Ready' %}active{% endif %}">
+            Ready
+        </a>
+
+        <a href="/orders?status=Out for Delivery"
+           class="{% if status_filter == 'Out for Delivery' %}active{% endif %}">
+            Out for Delivery
+        </a>
+
+        <a href="/orders?status=Delivered"
+           class="{% if status_filter == 'Delivered' %}active{% endif %}">
+            Delivered
+        </a>
+
+        <a href="/orders?status=Cancelled"
+           class="{% if status_filter == 'Cancelled' %}active{% endif %}">
+            Cancelled
+        </a>
+
+    </div>
+
+    <hr>
+
+    {% if orders %}
+
+        {% for order in orders %}
+
+            <div class="order-card">
+
+                <h3>
+                    Order #{{ order["order_id"] }}
+                </h3>
+
+                <p>
+                    Customer: {{ order["customer"]["name"] }}
+                </p>
+
+                <p>
+                    Phone: {{ order["customer"]["phone"] }}
+                </p>
+
+                <p>
+                    Status:
+                    <strong>{{ order.get("status", "New") }}</strong>
+                </p>
+
+                {% for item in order["items"] %}
+
+                    <p>
+                        {{ item["product"] }}
+                        — {{ item["quantity_grams"] }} g
+                    </p>
+
+                {% endfor %}
+
+                <p>
+                    <strong>
+                        Total: ₹{{ "%.2f"|format(order["total"]) }}
+                    </strong>
+                </p>
+
+
+                <a href="/order/{{ order['order_id'] }}">
+                    View Order
+                </a>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>No orders found.</p>
+
+    {% endif %}
+
+</body>
+
+</html>

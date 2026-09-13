@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Buddy - Order Confirmed</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <a class="brand" href="/">BUDDY</a>
+
+        <div class="nav-links">
+
+            <a href="/">Home</a>
+            <a href="/menu">Menu</a>
+            <a href="/cart">Cart</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/orders">Orders</a>
+            <a href="/search-order">Search Orders</a>
+            <a href="/current-orders">Current Orders</a>
+
+        </div>
+
+    </nav>
+
+    <h1>Buddy</h1>
+
+    <h2>Order Confirmed! ✓</h2>
+
+    <p>
+        Thank you, {{ order.customer.name }}!
+    </p>
+
+    <p>
+        Order ID: {{ order.order_id }}
+    </p>
+
+    <hr>
+
+    <h3>Order Summary</h3>
+
+    {% for item in order.items %}
+
+        <div>
+
+            <p>
+                {{ item.product.name }}
+                — {{ item.quantity_grams }} g
+                — ₹{{ "%.2f"|format(item.calculate_price()) }}
+            </p>
+
+        </div>
+
+    {% endfor %}
+
+    <hr>
+
+    <h3>
+        Total: ₹{{ "%.2f"|format(order.calculate_total()) }}
+    </h3>
+
+    <p>
+        Your order has been placed successfully.
+    </p>
+
+    <a href="/">Back to Home</a>
+
+</body>
+
+</html>

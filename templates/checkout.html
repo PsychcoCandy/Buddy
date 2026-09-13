@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>{{ shop.shop_name if shop else "Buddy" }} - Checkout</title>
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}"
+>
+
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    {% if shop %}
+        <a class="brand" href="/shop/{{ shop.subdomain }}">
+            {{ shop.shop_name }}
+        </a>
+    {% else %}
+        <a class="brand" href="/">
+            BUDDY
+        </a>
+    {% endif %}
+
+    <div class="nav-links">
+
+        {% if shop %}
+            <a href="/shop/{{ shop.subdomain }}">Home</a>
+            <a href="/shop/{{ shop.subdomain }}/menu">Menu</a>
+            <a href="/cart?shop={{ shop.subdomain }}">Cart</a>
+        {% else %}
+            <a href="/">Home</a>
+            <a href="/menu">Menu</a>
+            <a href="/cart">Cart</a>
+        {% endif %}
+
+        <a href="/dashboard">Dashboard</a>
+        <a href="/orders">Orders</a>
+        <a href="/search-order">Search Orders</a>
+
+    </div>
+
+</nav>
+
+
+<h1>
+    {{ shop.shop_name if shop else "Buddy" }}
+</h1>
+
+<h2>Checkout</h2>
+
+
+<h3>Order Summary</h3>
+
+{% for item in cart_items %}
+
+    <div>
+
+        <p>
+            {{ item.product }}
+            — {{ item.quantity }} g
+            — ₹{{ "%.2f"|format(item.price) }}
+        </p>
+
+    </div>
+
+{% endfor %}
+
+
+<hr>
+
+
+<h3>
+    Total: ₹{{ "%.2f"|format(total) }}
+</h3>
+
+
+<div class="checkout-card">
+
+    <h3>Customer Details</h3>
+
+    <form method="POST" action="/place-order">
+
+        {% if shop %}
+            <input
+                type="hidden"
+                name="shop_subdomain"
+                value="{{ shop.subdomain }}"
+            >
+        {% endif %}
+
+
+        <label for="name">
+            Customer Name
+        </label>
+
+        <input
+            type="text"
+            id="name"
+            name="name"
+            required
+        >
+
+        <br><br>
+
+
+        <label for="phone">
+            Phone Number
+        </label>
+
+        <input
+            type="tel"
+            id="phone"
+            name="phone"
+            maxlength="10"
+            required
+        >
+
+        <br><br>
+
+
+        <button type="submit">
+            Place Order
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+
+</html>

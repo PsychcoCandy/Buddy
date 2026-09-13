@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>{{ shop.shop_name if shop else "Buddy" }} - Cart</title>
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}"
+>
+
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    {% if shop %}
+        <a class="brand" href="/shop/{{ shop.subdomain }}">
+            {{ shop.shop_name }}
+        </a>
+    {% else %}
+        <a class="brand" href="/">
+            BUDDY
+        </a>
+    {% endif %}
+
+    <div class="nav-links">
+
+        {% if shop %}
+            <a href="/shop/{{ shop.subdomain }}">Home</a>
+            <a href="/shop/{{ shop.subdomain }}/menu">Menu</a>
+        {% else %}
+            <a href="/">Home</a>
+            <a href="/menu">Menu</a>
+        {% endif %}
+
+        
+        <a href="/cart">Cart</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/orders">Orders</a>
+        <a href="/search-order">Search Orders</a>
+        <a href="/current-orders">Current Orders</a>
+
+    </div>
+
+</nav>
+
+
+<h1>
+    {{ shop.shop_name if shop else "Buddy" }}
+</h1>
+
+<h2>Your Cart</h2>
+
+
+{% if cart_items %}
+
+    {% for item in cart_items %}
+
+        <div class="cart-item">
+
+            <h3>{{ item.product }}</h3>
+
+            <p>
+                Quantity: {{ item.quantity }} g
+            </p>
+
+            <p>
+                Price: ₹{{ "%.2f"|format(item.price) }}
+            </p>
+
+
+            <form method="POST" action="/update-cart">
+
+                <input
+                    type="hidden"
+                    name="product"
+                    value="{{ item.product }}"
+                >
+
+                <label>New quantity (grams):</label>
+
+                <input
+                    type="number"
+                    name="quantity"
+                    value="{{ item.quantity }}"
+                    min="1"
+                    required
+                >
+
+                <button type="submit">
+                    Update Quantity
+                </button>
+
+            </form>
+
+
+            <form method="POST" action="/remove-from-cart">
+
+                <input
+                    type="hidden"
+                    name="product"
+                    value="{{ item.product }}"
+                >
+
+                <button type="submit">
+                    Remove
+                </button>
+
+            </form>
+
+        </div>
+
+        <hr>
+
+    {% endfor %}
+
+
+    <div class="cart-total">
+
+        <h2>
+            Total: ₹{{ "%.2f"|format(total) }}
+        </h2>
+
+    </div>
+
+
+    <a href="/checkout">
+        Proceed to Checkout
+    </a>
+
+
+
+{% else %}
+
+    <p>Your cart is empty.</p>
+
+{% endif %}
+
+
+{% if shop %}
+
+    <a href="/shop/{{ shop.subdomain }}/menu">
+        Continue Shopping
+    </a>
+
+{% else %}
+
+    <a href="/menu">
+        Continue Shopping
+    </a>
+
+{% endif %}
+
+</body>
+
+</html>

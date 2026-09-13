@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{ shop.shop_name if shop else "Buddy" }}</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <a class="brand" href="/">
+            {{ shop.shop_name if shop else "BUDDY" }}
+        </a>
+
+        <div class="nav-links">
+
+            {% if shop %}
+                <a href="/shop/{{ shop.subdomain }}/menu">Menu</a>
+            {% else %}
+                <a href="/menu">Menu</a>
+            {% endif %}
+
+            <a href="/cart">Cart</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/orders">Orders</a>
+            <a href="/search-order">Search Orders</a>
+            <a href="/current-orders">Current Orders</a>
+
+        </div>
+
+    </nav>
+
+    <h1>
+        Welcome to {{ shop.shop_name if shop else "Buddy" }}!
+    </h1>
+
+    <h2>What would you like?</h2>
+
+    <div class="category-grid">
+
+        {% if shop %}
+
+            <a
+                href="/shop/{{ shop.subdomain }}/menu?category=Chicken"
+                class="category-card"
+            >
+                <h2>Chicken</h2>
+                <p>View Chicken Products</p>
+            </a>
+
+            <a
+                href="/shop/{{ shop.subdomain }}/menu?category=Mutton"
+                class="category-card"
+            >
+                <h2>Mutton</h2>
+                <p>View Mutton Products</p>
+            </a>
+
+        {% else %}
+
+            <a href="/menu?category=Chicken" class="category-card">
+                <h2>Chicken</h2>
+                <p>View Chicken Products</p>
+            </a>
+
+            <a href="/menu?category=Mutton" class="category-card">
+                <h2>Mutton</h2>
+                <p>View Mutton Products</p>
+            </a>
+
+        {% endif %}
+
+    </div>
+
+</body>
+
+</html>
