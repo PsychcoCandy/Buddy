@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+from database import db
+import os
 from flask import Flask, render_template, request, session, redirect, url_for, flash
 from products import load_products, load_shops, get_shop_by_subdomain
 from orders import (
@@ -18,8 +21,15 @@ from orders import (
 
 from customer import Customer
 
+load_dotenv()
 
 app = Flask(__name__)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db.init_app(app)
+
 app.secret_key = "buddy-secret-key"
 
 VERIFY_TOKEN = "buddy-webhook-token"
