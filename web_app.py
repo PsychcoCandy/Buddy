@@ -128,7 +128,7 @@ def shop_menu(subdomain):
 
     session["shop_subdomain"] = shop["subdomain"]
 
-    products = load_products()
+    products = get_products_by_shop(shop["shop_id"])
 
     category = request.args.get("category")
 
