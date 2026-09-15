@@ -43,6 +43,24 @@
 
     <h2>What would you like?</h2>
 
+    {% if products %}
+
+        <div class="product-grid">
+
+            {% for product in products %}
+
+                <div class="product-card">
+                    <h2>{{ product.name }}</h2>
+                    <p>{{ product.category }}</p>
+                    <p>₹{{ product.price_per_kg }}/kg</p>
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
     <div class="category-grid">
 
         {% if shop %}

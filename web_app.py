@@ -1,8 +1,8 @@
 from dotenv import load_dotenv
-from database import db
+from database import db, Shop, get_shop_by_subdomain, get_products_by_shop
 import os
 from flask import Flask, render_template, request, session, redirect, url_for, flash
-from products import load_products, load_shops, get_shop_by_subdomain
+from products import load_products, load_shops
 from orders import (
     Order,
     save_order,
@@ -545,7 +545,7 @@ def shop(subdomain):
 
     session["shop_subdomain"] = shop["subdomain"]
 
-    products = load_products()
+    products = get_products_by_shop(shop["shop_id"])
 
     return render_template(
         "home.html",
